@@ -92,6 +92,10 @@ export interface EngineConfig {
   steadyStateMinResponses: number;
   steadyStateConsecutive: number;
   pointsPerReinforcer: number;
+  /** Minimum responses per minute to consider the participant engaged */
+  lowResponseRateThreshold: number;
+  /** Number of consecutive low-rate bins before flagging */
+  lowResponseRateBins: number;
   rngSeed?: string;
 }
 
@@ -126,15 +130,17 @@ export const DEFAULT_ENGINE_CONFIG: EngineConfig = {
   codDurationMs: 2000,
   binSizeMs: 5000,
   minAPhaseDurationMs: 60000,
-  maxAPhaseDurationMs: 360000,
+  maxAPhaseDurationMs: 180000,
   perturbationDurationMs: 45000,
   practiceDurationMs: 30000,
   lockoutIntervalMs: 10000,
   lockoutDurationMs: 2000,
   steadyStateBins: 12,
-  steadyStateMaxSlope: 0.002,
-  steadyStateMaxSD: 0.08,
+  steadyStateMaxSlope: 0.0015,
+  steadyStateMaxSD: 0.06,
   steadyStateMinResponses: 100,
   steadyStateConsecutive: 2,
   pointsPerReinforcer: 1,
+  lowResponseRateThreshold: 6,
+  lowResponseRateBins: 3,
 };

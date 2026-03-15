@@ -55,32 +55,16 @@ export const TaskDisplay: React.FC<Props> = ({
 
   const palette = isContextShift ? PALETTES.contextShift : PALETTES.baseline;
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.repeat) return; // Ignore held keys
-    const key = e.key.toLowerCase();
-    if (key === 'f') {
+  const handleClick = useCallback((side: Side) => {
+    if (side === 'left') {
       setLeftPressed(true);
-      onResponse('left');
-    } else if (key === 'j') {
+      setTimeout(() => setLeftPressed(false), 100);
+    } else {
       setRightPressed(true);
-      onResponse('right');
+      setTimeout(() => setRightPressed(false), 100);
     }
+    onResponse(side);
   }, [onResponse]);
-
-  const handleKeyUp = useCallback((e: KeyboardEvent) => {
-    const key = e.key.toLowerCase();
-    if (key === 'f') setLeftPressed(false);
-    else if (key === 'j') setRightPressed(false);
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [handleKeyDown, handleKeyUp]);
 
   // Cleanup timers
   useEffect(() => {
@@ -132,6 +116,7 @@ export const TaskDisplay: React.FC<Props> = ({
     border: `3px solid ${pressed ? palette.accent : 'transparent'}`,
     userSelect: 'none' as const,
     minHeight: 300,
+    cursor: locked ? 'not-allowed' : 'pointer',
   });
 
   return (
@@ -164,9 +149,8 @@ export const TaskDisplay: React.FC<Props> = ({
       {/* Panels */}
       <div style={{ flex: 1, display: 'flex', padding: '32px 16px', gap: 0 }}>
         {/* Left panel */}
-        <div style={panelStyle('left', leftPressed, leftFlash, isLeftLocked)}>
-          <div style={{ fontSize: 72, fontWeight: 800, opacity: 0.9 }}>F</div>
-          <div style={{ fontSize: 16, opacity: 0.6, marginTop: 8 }}>Left</div>
+        <div style={panelStyle('left', leftPressed, leftFlash, isLeftLocked)} onClick={() => handleClick('left')}>
+          <div style={{ fontSize: 48, fontWeight: 800, opacity: 0.9 }}>Left</div>
           {isLeftLocked && (
             <div style={{
               position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -178,9 +162,8 @@ export const TaskDisplay: React.FC<Props> = ({
         </div>
 
         {/* Right panel */}
-        <div style={panelStyle('right', rightPressed, rightFlash, isRightLocked)}>
-          <div style={{ fontSize: 72, fontWeight: 800, opacity: 0.9 }}>J</div>
-          <div style={{ fontSize: 16, opacity: 0.6, marginTop: 8 }}>Right</div>
+        <div style={panelStyle('right', rightPressed, rightFlash, isRightLocked)} onClick={() => handleClick('right')}>
+          <div style={{ fontSize: 48, fontWeight: 800, opacity: 0.9 }}>Right</div>
           {isRightLocked && (
             <div style={{
               position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -194,7 +177,7 @@ export const TaskDisplay: React.FC<Props> = ({
 
       {/* Footer */}
       <div style={{ padding: '12px 32px', textAlign: 'center', opacity: 0.4, fontSize: 12 }}>
-        Press F for left, J for right
+        Click a panel to respond
       </div>
     </div>
   );

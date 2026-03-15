@@ -16,6 +16,7 @@ export type EventType =
   | 'experiment_end'
   | 'focus_lost'
   | 'focus_restored'
+  | 'low_response_rate'
   | 'session_restored'
   | 'upload_error';
 

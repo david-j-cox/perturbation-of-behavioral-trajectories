@@ -6,7 +6,7 @@ A production-ready browser experiment for a human concurrent-operants task with 
 
 ### Task Overview
 
-Participants make choices between two concurrently available response options (F key = left, J key = right). Responses may produce point reinforcers according to independent concurrent VI schedules. The participant sees a running point total and response feedback but no schedule details.
+Participants make choices between two concurrently available response options by clicking on left or right panels. Responses may produce point reinforcers according to independent concurrent VI schedules. The participant sees a running point total and response feedback but no schedule details.
 
 ### Schedule Parameters
 
@@ -16,7 +16,7 @@ Participants make choices between two concurrently available response options (F
 | COD (changeover delay) | 2 s |
 | Bin size | 5 s |
 | Min A phase duration | 60 s |
-| Max A phase duration | 360 s |
+| Max A phase duration | 180 s |
 | Perturbation phase duration | 45 s |
 | Practice duration | 30 s |
 
@@ -28,7 +28,7 @@ Participants make choices between two concurrently available response options (F
 
 ### Counterbalancing Scheme
 
-6 perturbation orders, 5 participants each = 30 total:
+6 perturbation orders, 2 participants each = 12 target (budget-dependent):
 
 | Order | Phase Sequence |
 |---|---|
@@ -44,8 +44,8 @@ Participants make choices between two concurrently available response options (F
 A phases end when **all** of the following are met on **two consecutive** bin checks:
 - At least 60 s elapsed
 - 12 completed bins available
-- |OLS slope| of left allocation over most recent 12 bins ≤ 0.002
-- SD of left allocation over those bins ≤ 0.08
+- |OLS slope| of left allocation over most recent 12 bins ≤ 0.0015
+- SD of left allocation over those bins ≤ 0.06
 - At least 100 total responses across those bins
 
 Otherwise, A phases timeout at 360 s.
@@ -214,10 +214,10 @@ Set these environment variables in Vercel dashboard:
 ## Known Limitations & Pilot Checks
 
 - **Browser focus**: The experiment does not pause if the browser tab loses focus. Consider adding a focus-loss detector for data quality.
-- **Mobile**: Designed for desktop keyboard input only. Mobile browsers are not supported.
+- **Mobile**: Designed for desktop use. Mobile browsers are not officially supported but click-based input should function.
 - **Refresh recovery**: If a participant refreshes mid-experiment, the session is not resumable. A new session would be created.
 - **Clock drift**: `performance.now()` is used for relative timing within sessions. Wall-clock timestamps are logged for cross-session alignment.
-- **Audio**: The D perturbation tone requires a prior user gesture (click/keypress) to enable Web Audio. The instructions screen satisfies this.
+- **Audio**: The D perturbation tone requires a prior user gesture (click) to enable Web Audio. The instructions screen satisfies this.
 
 ### Pilot Checklist
 

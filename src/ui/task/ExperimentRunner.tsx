@@ -42,6 +42,7 @@ export const ExperimentRunner: React.FC<Props> = ({
   const [lockoutDisplay, setLockoutDisplay] = useState<LockoutState>({
     active: false, lockedSide: null, startTimeMs: 0, durationMs: 0, nextLockoutTimeMs: 0,
   });
+  const [showTransition, setShowTransition] = useState(false);
 
   // Mutable state refs for the game loop (not React state to avoid re-render overhead)
   const phaseState = useRef<PhaseState | null>(null);
@@ -59,6 +60,7 @@ export const ExperimentRunner: React.FC<Props> = ({
   const hiddenAtMs = useRef<number | null>(null);
   const totalPausedMs = useRef(0);
   const gameLoopRef = useRef<() => void>(() => {});
+  const lowRateFlagged = useRef(false);
 
   // Initialize phases
   useEffect(() => {
@@ -189,6 +191,7 @@ export const ExperimentRunner: React.FC<Props> = ({
     const startTime = nowMs();
     phaseStartTimeMs.current = startTime;
     consecutiveSteadyPasses.current = 0;
+    lowRateFlagged.current = false;
 
     // Determine preferred key from last A phase bins
     let preferredKey: Side | null = null;
@@ -299,8 +302,9 @@ export const ExperimentRunner: React.FC<Props> = ({
     setLockoutDisplay({ active: false, lockedSide: null, startTimeMs: 0, durationMs: 0, nextLockoutTimeMs: 0 });
 
     if (practiceMode.current) {
-      // Practice is done, start main experiment
+      // Practice is done — show transition screen
       practiceMode.current = false;
+      isRunning.current = false;
       logger.logEvent({
         event_type: 'practice_end',
         client_timestamp_ms: endTime,
@@ -308,7 +312,7 @@ export const ExperimentRunner: React.FC<Props> = ({
       // Reset points after practice
       cumulativePoints.current = 0;
       setTotalPoints(0);
-      startPhase(0);
+      setShowTransition(true);
     } else {
       // Next phase
       const nextIndex = phases.current.findIndex(p => p.index === phaseDef.index) + 1;
@@ -340,7 +344,7 @@ export const ExperimentRunner: React.FC<Props> = ({
 
     const currentTime = nowMs();
     const elapsed = currentTime - ps.startTimeMs;
-    const key = side === 'left' ? 'f' : 'j';
+    const key = 'click';
 
     // Check for switch
     const isSwitch = ps.lastResponseSide !== null && ps.lastResponseSide !== side;
@@ -545,6 +549,30 @@ export const ExperimentRunner: React.FC<Props> = ({
       ps.currentBinIndex++;
     }
 
+    // Check for low response rate (flag disengaged participants)
+    if (!practiceMode.current && !lowRateFlagged.current && ps.bins.length >= config.lowResponseRateBins) {
+      const checkBins = ps.bins.slice(-config.lowResponseRateBins);
+      const totalResp = checkBins.reduce((s, b) => s + b.totalResponses, 0);
+      const windowMinutes = (config.lowResponseRateBins * config.binSizeMs) / 60000;
+      const ratePerMinute = totalResp / windowMinutes;
+
+      if (ratePerMinute < config.lowResponseRateThreshold) {
+        lowRateFlagged.current = true;
+        logger.logEvent({
+          event_type: 'low_response_rate',
+          client_timestamp_ms: currentTime,
+          phase_label: ps.phaseDef.label,
+          phase_index: ps.phaseDef.index,
+          metadata_json: {
+            rate_per_minute: ratePerMinute,
+            threshold: config.lowResponseRateThreshold,
+            bins_checked: config.lowResponseRateBins,
+            total_responses_in_window: totalResp,
+          },
+        });
+      }
+    }
+
     // Check phase end conditions
     if (practiceMode.current) {
       // Practice: fixed duration
@@ -602,6 +630,38 @@ export const ExperimentRunner: React.FC<Props> = ({
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
   }, [currentPhaseIndex, gameLoop]);
+
+  const handleTransitionDismiss = useCallback(() => {
+    setShowTransition(false);
+    isRunning.current = true;
+    startPhase(0);
+  }, [startPhase]);
+
+  if (showTransition) {
+    return (
+      <div style={{
+        width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        background: '#1e293b', color: '#f1f5f9', fontFamily: 'system-ui, sans-serif',
+      }}>
+        <h1 style={{ fontSize: 28, marginBottom: 16 }}>Practice Complete</h1>
+        <p style={{ fontSize: 16, opacity: 0.7, maxWidth: 400, textAlign: 'center', lineHeight: 1.6, marginBottom: 32 }}>
+          The practice round is over. Points have been reset to zero.
+          When you click the button below, the main experiment will begin.
+        </p>
+        <button
+          onClick={handleTransitionDismiss}
+          style={{
+            padding: '14px 40px', fontSize: 16, fontWeight: 600,
+            background: '#2563eb', color: 'white', border: 'none',
+            borderRadius: 8, cursor: 'pointer',
+          }}
+        >
+          Begin Experiment
+        </button>
+      </div>
+    );
+  }
 
   return (
     <TaskDisplay

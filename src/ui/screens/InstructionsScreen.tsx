@@ -13,8 +13,8 @@ export const InstructionsScreen: React.FC<Props> = ({ onReady }) => {
       content: (
         <>
           <p>In this task, you will see two panels on the screen — one on the left and one on the right.</p>
-          <p>You can respond to the left panel by pressing the <kbd style={{ padding: '2px 6px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: 3 }}>F</kbd> key, and to the right panel by pressing the <kbd style={{ padding: '2px 6px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: 3 }}>J</kbd> key.</p>
-          <p>Pressing a key may sometimes earn you points. Your goal is to earn as many points as you can.</p>
+          <p>You can respond by clicking on either panel.</p>
+          <p>Clicking a panel may sometimes earn you points. Your goal is to earn as many points as you can.</p>
         </>
       ),
     },
@@ -22,7 +22,7 @@ export const InstructionsScreen: React.FC<Props> = ({ onReady }) => {
       title: 'Earning Points',
       content: (
         <>
-          <p>Points are not available after every key press. Sometimes a response will earn a point and sometimes it will not.</p>
+          <p>Points are not available after every click. Sometimes a response will earn a point and sometimes it will not.</p>
           <p>Both sides can produce points, but the timing varies. Feel free to respond on whichever side you prefer, as often as you like.</p>
           <p>Your running point total is displayed at the top of the screen.</p>
         </>
