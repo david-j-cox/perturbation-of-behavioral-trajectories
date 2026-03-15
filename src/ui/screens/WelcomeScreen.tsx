@@ -21,7 +21,7 @@ export const WelcomeScreen: React.FC<Props> = ({ onConsent, onDecline }) => {
 
         <p><strong>Purpose:</strong> This study examines how people make choices between two options over time. You will click on panels to earn points.</p>
 
-        <p><strong>Procedure:</strong> You will see two panels on screen. Clicking on a panel may earn you points. The study consists of several phases and takes approximately 30-60 minutes to complete.</p>
+        <p><strong>Procedure:</strong> You will see two panels on screen. Clicking on a panel may earn you points. The study consists of several phases and takes approximately 20-25 minutes to complete.</p>
 
         <p><strong>Risks:</strong> There are no known risks beyond those of everyday computer use. You may experience mild fatigue from the repetitive clicking task.</p>
 

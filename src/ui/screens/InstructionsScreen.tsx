@@ -34,7 +34,7 @@ export const InstructionsScreen: React.FC<Props> = ({ onReady }) => {
         <>
           <p>The task has several phases. Conditions may change between phases. You do not need to do anything differently — just keep responding to earn points.</p>
           <p>Occasionally, one side may become temporarily unavailable. If this happens, you can continue responding on the other side.</p>
-          <p>The study takes approximately 30-60 minutes. Please stay focused and respond at a comfortable pace throughout.</p>
+          <p>The study takes approximately 20-25 minutes. Please stay focused and respond at a comfortable pace throughout.</p>
         </>
       ),
     },
