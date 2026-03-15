@@ -25,13 +25,13 @@ const PALETTES = {
 
 // Static fake leaderboard entries
 const FAKE_LEADERS = [
-  { name: 'Alex M.', score: 142 },
-  { name: 'Jordan K.', score: 128 },
-  { name: 'Sam T.', score: 119 },
-  { name: 'Riley P.', score: 105 },
-  { name: 'Casey W.', score: 97 },
-  { name: 'Morgan L.', score: 88 },
-  { name: 'Quinn D.', score: 74 },
+  { name: 'Alex M.', score: 102 },
+  { name: 'Jordan K.', score: 91 },
+  { name: 'Sam T.', score: 79 },
+  { name: 'Riley P.', score: 68 },
+  { name: 'Casey W.', score: 55 },
+  { name: 'Morgan L.', score: 43 },
+  { name: 'Quinn D.', score: 34 },
 ];
 
 interface Props {
