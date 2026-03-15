@@ -63,10 +63,10 @@ export const App: React.FC = () => {
     }
   }, []);
 
-  // Generate completion code from session ID
+  // Fixed Prolific completion code
   const generateCompletionCode = useCallback(() => {
-    return sessionId.split('-').slice(0, 2).join('').toUpperCase();
-  }, [sessionId]);
+    return 'C9HF9X23';
+  }, []);
 
   const isComplete = useRef(false);
 
