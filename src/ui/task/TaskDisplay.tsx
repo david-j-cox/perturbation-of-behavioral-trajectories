@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { Side, PhaseType, LockoutState } from '../../engine/types';
 
 // Color palettes for context shift (D perturbation)
@@ -22,6 +22,17 @@ const PALETTES = {
     pressRight: '#059669',
   },
 };
+
+// Static fake leaderboard entries
+const FAKE_LEADERS = [
+  { name: 'Alex M.', score: 142 },
+  { name: 'Jordan K.', score: 128 },
+  { name: 'Sam T.', score: 119 },
+  { name: 'Riley P.', score: 105 },
+  { name: 'Casey W.', score: 97 },
+  { name: 'Morgan L.', score: 88 },
+  { name: 'Quinn D.', score: 74 },
+];
 
 interface Props {
   phaseLabel: string;
@@ -93,16 +104,26 @@ export const TaskDisplay: React.FC<Props> = ({
     return () => { delete (window as any).__taskFlash; };
   }, [flashSide]);
 
+  // Build sorted leaderboard with player inserted
+  const leaderboard = useMemo(() => {
+    const entries = [
+      ...FAKE_LEADERS.map(e => ({ ...e, isPlayer: false })),
+      { name: 'You', score: totalPoints, isPlayer: true },
+    ];
+    entries.sort((a, b) => b.score - a.score);
+    return entries;
+  }, [totalPoints]);
+
   const isLeftLocked = lockout.active && lockout.lockedSide === 'left';
   const isRightLocked = lockout.active && lockout.lockedSide === 'right';
 
   const panelStyle = (side: Side, pressed: boolean, flash: boolean, locked: boolean): React.CSSProperties => ({
-    flex: 1,
+    width: 220,
+    height: 160,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: '0 16px',
     borderRadius: 16,
     background: flash
       ? '#fbbf24'
@@ -111,11 +132,11 @@ export const TaskDisplay: React.FC<Props> = ({
         : locked
           ? '#4a1c1c'
           : (side === 'left' ? palette.leftPanel : palette.rightPanel),
-    transition: 'background 0.08s ease',
+    transition: 'background 0.08s ease, transform 0.05s ease',
+    transform: pressed ? 'scale(0.97)' : 'scale(1)',
     position: 'relative',
-    border: `3px solid ${pressed ? palette.accent : 'transparent'}`,
+    border: `3px solid ${pressed ? palette.accent : '#d0d5dd44'}`,
     userSelect: 'none' as const,
-    minHeight: 300,
     cursor: locked ? 'not-allowed' : 'pointer',
   });
 
@@ -129,6 +150,7 @@ export const TaskDisplay: React.FC<Props> = ({
       <div style={{
         display: 'flex', justifyContent: 'center', alignItems: 'center',
         padding: '16px 32px', borderBottom: `1px solid ${palette.accent}33`,
+        position: 'relative',
       }}>
         {showContextShiftLabel && (
           <div style={{
@@ -144,35 +166,77 @@ export const TaskDisplay: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Panels */}
-      <div style={{ flex: 1, display: 'flex', padding: '32px 16px', gap: 0 }}>
-        {/* Left panel */}
-        <div style={panelStyle('left', leftPressed, leftFlash, isLeftLocked)} onClick={() => handleClick('left')}>
-          <div style={{ fontSize: 48, fontWeight: 800, opacity: 0.9 }}>Left</div>
-          {isLeftLocked && (
-            <div style={{
-              position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(0,0,0,0.6)', borderRadius: 16, fontSize: 16, fontWeight: 600, color: '#fca5a5',
-            }}>
-              Temporarily unavailable
-            </div>
-          )}
+      {/* Main content area */}
+      <div style={{ flex: 1, display: 'flex', padding: '20px 24px', gap: 28 }}>
+        {/* Task area — panels centered */}
+        <div style={{
+          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 32,
+        }}>
+          {/* Left panel */}
+          <div style={panelStyle('left', leftPressed, leftFlash, isLeftLocked)} onClick={() => handleClick('left')}>
+            <div style={{ fontSize: 22, fontWeight: 700, opacity: 0.9 }}>Option A</div>
+            {isLeftLocked && (
+              <div style={{
+                position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(0,0,0,0.6)', borderRadius: 16, fontSize: 14, fontWeight: 600, color: '#fca5a5',
+              }}>
+                Temporarily unavailable
+              </div>
+            )}
+          </div>
+
+          {/* Right panel */}
+          <div style={panelStyle('right', rightPressed, rightFlash, isRightLocked)} onClick={() => handleClick('right')}>
+            <div style={{ fontSize: 22, fontWeight: 700, opacity: 0.9 }}>Option B</div>
+            {isRightLocked && (
+              <div style={{
+                position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(0,0,0,0.6)', borderRadius: 16, fontSize: 14, fontWeight: 600, color: '#fca5a5',
+              }}>
+                Temporarily unavailable
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Right panel */}
-        <div style={panelStyle('right', rightPressed, rightFlash, isRightLocked)} onClick={() => handleClick('right')}>
-          <div style={{ fontSize: 48, fontWeight: 800, opacity: 0.9 }}>Right</div>
-          {isRightLocked && (
-            <div style={{
-              position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(0,0,0,0.6)', borderRadius: 16, fontSize: 16, fontWeight: 600, color: '#fca5a5',
+        {/* Leaderboard sidebar */}
+        <div style={{
+          width: 220, flexShrink: 0,
+          background: isContextShift ? '#1f3d1f' : '#273548',
+          border: `1px solid ${isContextShift ? '#3d5a3d' : '#3a4a5c'}`,
+          borderRadius: 12, padding: 16,
+          display: 'flex', flexDirection: 'column',
+          alignSelf: 'flex-start', marginTop: 20,
+        }}>
+          <div style={{
+            fontSize: 14, fontWeight: 700, marginBottom: 12,
+            color: palette.accent, textAlign: 'center',
+            borderBottom: `1px solid ${palette.accent}33`, paddingBottom: 8,
+          }}>
+            Leaderboard
+          </div>
+          {leaderboard.map((entry, i) => (
+            <div key={entry.name} style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '5px 8px', borderRadius: 6, marginBottom: 2,
+              fontSize: 13,
+              background: entry.isPlayer ? `${palette.accent}22` : 'transparent',
+              fontWeight: entry.isPlayer ? 700 : 400,
+              color: entry.isPlayer ? palette.accent : palette.text,
             }}>
-              Temporarily unavailable
+              <span style={{ width: 20, textAlign: 'right', opacity: 0.6, fontWeight: 700 }}>
+                {i + 1}.
+              </span>
+              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {entry.name}
+              </span>
+              <span style={{ fontWeight: 700, opacity: entry.isPlayer ? 1 : 0.7 }}>
+                {entry.score.toLocaleString()}
+              </span>
             </div>
-          )}
+          ))}
         </div>
       </div>
-
     </div>
   );
 };
