@@ -127,21 +127,19 @@ export const TaskDisplay: React.FC<Props> = ({
     }}>
       {/* Header */}
       <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        display: 'flex', justifyContent: 'center', alignItems: 'center',
         padding: '16px 32px', borderBottom: `1px solid ${palette.accent}33`,
       }}>
-        <div style={{ fontSize: 14, opacity: 0.7 }}>
-          {isPractice ? 'Practice Round' : `Phase ${phaseLabel}`}
-        </div>
         {showContextShiftLabel && (
           <div style={{
+            position: 'absolute', left: 32,
             fontSize: 14, fontWeight: 600, color: palette.accent,
             padding: '4px 12px', background: `${palette.accent}22`, borderRadius: 4,
           }}>
             Context Shift
           </div>
         )}
-        <div style={{ fontSize: 20, fontWeight: 700 }}>
+        <div style={{ fontSize: 28, fontWeight: 700 }}>
           Points: <span style={{ color: palette.accent }}>{totalPoints}</span>
         </div>
       </div>
@@ -175,10 +173,6 @@ export const TaskDisplay: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Footer */}
-      <div style={{ padding: '12px 32px', textAlign: 'center', opacity: 0.4, fontSize: 12 }}>
-        Click a panel to respond
-      </div>
     </div>
   );
 };
