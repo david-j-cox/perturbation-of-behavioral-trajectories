@@ -12,11 +12,12 @@ export function generateInterval(viMs: number, rng: () => number): number {
 }
 
 /** Create initial schedule state */
-export function createScheduleState(intervalMs: number, startTimeMs: number, rng: () => number): ScheduleState {
+export function createScheduleState(intervalMs: number, startTimeMs: number, rng: () => number, fixed: boolean = false): ScheduleState {
   return {
     intervalMs,
+    fixedInterval: fixed,
     baited: false,
-    nextBaitTimeMs: startTimeMs + generateInterval(intervalMs, rng),
+    nextBaitTimeMs: startTimeMs + (fixed ? intervalMs : generateInterval(intervalMs, rng)),
     lastReinforcerTimeMs: 0,
   };
 }
@@ -30,7 +31,7 @@ export function updateBaiting(schedule: ScheduleState, currentTimeMs: number, rn
     return {
       ...schedule,
       baited: true,
-      nextBaitTimeMs: currentTimeMs + generateInterval(schedule.intervalMs, rng),
+      nextBaitTimeMs: currentTimeMs + (schedule.fixedInterval ? schedule.intervalMs : generateInterval(schedule.intervalMs, rng)),
     };
   }
   return schedule;

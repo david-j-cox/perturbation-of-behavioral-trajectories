@@ -77,18 +77,28 @@ export function getScheduleValuesForPhase(
   phaseDef: PhaseDef,
   config: EngineConfig,
   preferredKey: Side | null
-): { leftMs: number; rightMs: number } {
+): { leftMs: number; rightMs: number; fixed: boolean } {
+  if (phaseDef.type === 'practice') {
+    return {
+      leftMs: config.practiceIntervalMs,
+      rightMs: config.practiceIntervalMs,
+      fixed: true,
+    };
+  }
+
   if (phaseDef.type === 'B' && preferredKey) {
     // B perturbation: enrich less-preferred, lean more-preferred
     if (preferredKey === 'left') {
       return {
         leftMs: config.viPerturbBMorePreferredMs,  // 30s - lean
         rightMs: config.viPerturbBLessPreferredMs,  // 8s - rich
+        fixed: false,
       };
     } else {
       return {
         leftMs: config.viPerturbBLessPreferredMs,   // 8s - rich
         rightMs: config.viPerturbBMorePreferredMs,   // 30s - lean
+        fixed: false,
       };
     }
   }
@@ -97,6 +107,7 @@ export function getScheduleValuesForPhase(
   return {
     leftMs: config.viBaselineMs,
     rightMs: config.viBaselineMs,
+    fixed: false,
   };
 }
 
@@ -110,14 +121,14 @@ export function createInitialPhaseState(
   preferredKey: Side | null,
   rng: () => number
 ): PhaseState {
-  const { leftMs, rightMs } = getScheduleValuesForPhase(phaseDef, config, preferredKey);
+  const { leftMs, rightMs, fixed } = getScheduleValuesForPhase(phaseDef, config, preferredKey);
 
   return {
     phaseDef,
     startTimeMs,
     elapsedMs: 0,
-    leftSchedule: createScheduleState(leftMs, startTimeMs, rng),
-    rightSchedule: createScheduleState(rightMs, startTimeMs, rng),
+    leftSchedule: createScheduleState(leftMs, startTimeMs, rng, fixed),
+    rightSchedule: createScheduleState(rightMs, startTimeMs, rng, fixed),
     cod: createCODState(),
     lockout: createLockoutState(),
     bins: [],

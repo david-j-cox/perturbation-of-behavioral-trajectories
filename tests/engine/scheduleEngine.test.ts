@@ -71,6 +71,7 @@ describe('scheduleEngine', () => {
     it('delivers when baited and no COD/lockout', () => {
       const state: ReturnType<typeof createScheduleState> = {
         intervalMs: 20000,
+        fixedInterval: false,
         baited: true,
         nextBaitTimeMs: 40000,
         lastReinforcerTimeMs: 0,
@@ -82,19 +83,19 @@ describe('scheduleEngine', () => {
     });
 
     it('does not deliver when COD active', () => {
-      const state = { intervalMs: 20000, baited: true, nextBaitTimeMs: 40000, lastReinforcerTimeMs: 0 };
+      const state = { intervalMs: 20000, fixedInterval: false, baited: true, nextBaitTimeMs: 40000, lastReinforcerTimeMs: 0 };
       const { delivered } = checkReinforcement(state, 21000, true, false);
       expect(delivered).toBe(false);
     });
 
     it('does not deliver when lockout active', () => {
-      const state = { intervalMs: 20000, baited: true, nextBaitTimeMs: 40000, lastReinforcerTimeMs: 0 };
+      const state = { intervalMs: 20000, fixedInterval: false, baited: true, nextBaitTimeMs: 40000, lastReinforcerTimeMs: 0 };
       const { delivered } = checkReinforcement(state, 21000, false, true);
       expect(delivered).toBe(false);
     });
 
     it('does not deliver when not baited', () => {
-      const state = { intervalMs: 20000, baited: false, nextBaitTimeMs: 40000, lastReinforcerTimeMs: 0 };
+      const state = { intervalMs: 20000, fixedInterval: false, baited: false, nextBaitTimeMs: 40000, lastReinforcerTimeMs: 0 };
       const { delivered } = checkReinforcement(state, 21000, false, false);
       expect(delivered).toBe(false);
     });

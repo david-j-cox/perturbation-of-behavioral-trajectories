@@ -18,9 +18,10 @@ export interface PhaseDef {
   perturbationInstance?: 1 | 2;
 }
 
-/** VI schedule state for one side */
+/** Schedule state for one side */
 export interface ScheduleState {
   intervalMs: number;
+  fixedInterval: boolean;
   baited: boolean;
   nextBaitTimeMs: number;
   lastReinforcerTimeMs: number;
@@ -92,6 +93,8 @@ export interface EngineConfig {
   steadyStateMinResponses: number;
   steadyStateConsecutive: number;
   pointsPerReinforcer: number;
+  /** Practice schedule interval (FI) */
+  practiceIntervalMs: number;
   /** Minimum responses per minute to consider the participant engaged */
   lowResponseRateThreshold: number;
   /** Number of consecutive low-rate bins before flagging */
@@ -135,6 +138,7 @@ export const DEFAULT_ENGINE_CONFIG: EngineConfig = {
   practiceDurationMs: 30000,
   lockoutIntervalMs: 10000,
   lockoutDurationMs: 2000,
+  practiceIntervalMs: 5000,
   steadyStateBins: 12,
   steadyStateMaxSlope: 0.0015,
   steadyStateMaxSD: 0.06,
